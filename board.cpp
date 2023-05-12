@@ -260,6 +260,26 @@ std::string Board::exportFEN() {
     return FEN;
 }
 
+std::string Board::getSideToMove(){
+    return std::string(1,sideToMove);
+}
+
+std::string Board::getCastlingAvailability(){
+    return castlingAvailability;
+}
+
+std::string Board::getEnPassantTargetSquare(){
+    return enPassantTargetSquare;
+}
+
+int Board::getHalfMoveClock(){
+    return halfMoveClock;
+}
+
+int Board::getFullMoveNumber(){
+    return fullMoveNumber;
+}
+
 int main()
 {
     Board board;
