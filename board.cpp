@@ -182,10 +182,82 @@ void Board::printBoard(){
     }
 }
 
+std::string Board::exportFEN() {
+    std::string FEN = "";
+    int emptyCount = 0;
+
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 0; file < 8; file++) {
+            int tile = rank * 8 + file;
+            Piece piece = squares[tile];
+
+            if (piece == EMPTY) {
+                emptyCount++;
+            } else {
+                if (emptyCount > 0) {
+                    FEN += std::to_string(emptyCount);
+                    emptyCount = 0;
+                }
+
+                switch (piece) {
+                    case PAWN:
+                        FEN += 'P';
+                        break;
+                    case KNIGHT:
+                        FEN += 'N';
+                        break;
+                    case BISHOP:
+                        FEN += 'B';
+                        break;
+                    case ROOK:
+                        FEN += 'R';
+                        break;
+                    case QUEEN:
+                        FEN += 'Q';
+                        break;
+                    case KING:
+                        FEN += 'K';
+                        break;
+                    case BLACK_PAWN:
+                        FEN += 'p';
+                        break;
+                    case BLACK_KNIGHT:
+                        FEN += 'n';
+                        break;
+                    case BLACK_BISHOP:
+                        FEN += 'b';
+                        break;
+                    case BLACK_ROOK:
+                        FEN += 'r';
+                        break;
+                    case BLACK_QUEEN:
+                        FEN += 'q';
+                        break;
+                    case BLACK_KING:
+                        FEN += 'k';
+                        break;
+                }
+            }
+        }
+
+        if (emptyCount > 0) {
+            FEN += std::to_string(emptyCount);
+            emptyCount = 0;
+        }
+
+        if (rank > 0) {
+            FEN += '/';
+        }
+    }
+
+    return FEN;
+}
+
 int main()
 {
     Board board;
     board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     board.printBoard();
+    std::cout<<board.exportFEN()<<std::endl;
     return 0;
 }
