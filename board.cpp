@@ -250,6 +250,13 @@ std::string Board::exportFEN() {
         }
     }
 
+    // Append additional FEN information
+    FEN += " " + std::string(1,sideToMove);// Convert the char to a string
+    FEN += " " + castlingAvailability;
+    FEN += " " + enPassantTargetSquare; //En passant target square (- or e3)
+    FEN += " " + std::to_string(halfMoveClock);
+    FEN += " " + std::to_string(fullMoveNumber);
+
     return FEN;
 }
 
