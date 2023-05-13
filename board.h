@@ -19,9 +19,11 @@ enum Piece {
 
 enum MoveType {
     NORMAL,        //Normal move
+    DOUBLE_PAWN_PUSH, //Pawn moving 2 tiles upward
     CASTLING,      //Castling move
     PROMOTION,     //Pawn promotion move
     EN_PASSANT,    //En passant move
+    CAPTURE,       //Capturing move
     INVALID        //Invalid move
 };
 
@@ -35,6 +37,33 @@ class Board {
         std::string enPassantTargetSquare;
         int halfMoveClock;
         int fullMoveNumber;
+
+    public:
+        Board(); 
+
+        //Piece methods
+        Piece getPiece(int file, int rank);
+        void setPiece(int rank, int file, Piece piece);
+        Piece getPieceFromFENCharacter(char piece);
+        void setupPositionFromFEN(const std::string& fen);
+        void printBoard();
+
+        // FEN-related functions
+        std::string exportFEN();
+        std::string getSideToMove();
+        std::string getCastlingAvailability();
+        std::string getEnPassantTargetSquare();
+        int getHalfMoveClock();
+        int getFullMoveNumber();
+
+        //Move related functions
+        std::vector<Move> generateLegalMoves(char sideToMove);
+        bool isMoveLegal(const Move& move);
+        //Helper function for if a piece corresponds to the right color
+        bool isColoredMove(char sideToMove, const Piece& piece);
+        void validPawnmove(std::vector<Move> legalMoves, int rank, int file, int squareIndex);
+};
+
 
         /**
          * Move information
@@ -55,28 +84,5 @@ class Board {
             }
 
         };
-
-    public:
-        Board(); 
-
-        //Piece methods
-        Piece getPiece(int file, int rank);
-        void setPiece(int rank, int file, Piece piece);
-        Piece getPieceFromFENCharacter(char piece);
-        void setupPositionFromFEN(const std::string& fen);
-        void printBoard();
-
-        // FEN-related functions
-        std::string exportFEN();
-        std::string getSideToMove();
-        std::string getCastlingAvailability();
-        std::string getEnPassantTargetSquare();
-        int getHalfMoveClock();
-        int getFullMoveNumber();
-
-        // Move related functions
-        std::vector<Move> generateLegalMoves();
-        bool isMoveLegal(const Move& move);
-};
 
 #endif  // BOARD_H
