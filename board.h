@@ -17,6 +17,14 @@ enum Piece {
     BLACK_KING = -KING
     };
 
+enum MoveType {
+    NORMAL,        //Normal move
+    CASTLING,      //Castling move
+    PROMOTION,     //Pawn promotion move
+    EN_PASSANT,    //En passant move
+    INVALID        //Invalid move
+};
+
 class Board {
     private:
         Piece squares[64];
@@ -27,6 +35,26 @@ class Board {
         std::string enPassantTargetSquare;
         int halfMoveClock;
         int fullMoveNumber;
+
+        /**
+         * Move information
+        */
+        struct Move{
+            int sourceSquare;
+            int targetSquare;
+            Piece movedPiece;
+            Piece capturedPiece;
+            MoveType moveType;
+
+            Move(int source, int target, Piece moved, Piece captured, MoveType type){
+                sourceSquare = source;
+                targetSquare = target;
+                movedPiece = moved;
+                capturedPiece = captured;
+                moveType = type;
+            }
+
+        };
 
     public:
         Board(); 
@@ -45,6 +73,10 @@ class Board {
         std::string getEnPassantTargetSquare();
         int getHalfMoveClock();
         int getFullMoveNumber();
+
+        // Move related functions
+        std::vector<Move> generateLegalMoves();
+        bool isMoveLegal(const Move& move);
 };
 
 #endif  // BOARD_H
