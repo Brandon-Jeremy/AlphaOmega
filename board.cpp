@@ -12,8 +12,8 @@
 */
 Board::Board() {
     // Initialize the board to the starting position
-    for (int i = 0; i < 64; i++) {
-        squares[i] = Piece::EMPTY;
+    for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
+        squares[squareIndex] = Piece::EMPTY;
     }
     Board::sideToMove = 'w'; // White to play initially
 
@@ -66,8 +66,8 @@ Piece Board::getPieceFromFENCharacter(char piece){
 
 void Board::setupPositionFromFEN(const std::string& fen){
     // Reset the board to its initial state
-    for(int i =0;i<64;i++){
-        squares[i]=EMPTY;
+    for(int squareIndex =0;squareIndex<64;squareIndex++){
+        squares[squareIndex]=EMPTY;
     }
     
     /**
@@ -278,6 +278,96 @@ int Board::getHalfMoveClock(){
 
 int Board::getFullMoveNumber(){
     return fullMoveNumber;
+}
+
+void Board::validPawnmove(std::vector<Move> legalMoves, int rank, int file, int squareIndex){
+    //If the pawn is on the first rank, it has the chance to:
+    //move once, move twice, capture if possible
+
+    //This determines if we are moving forward as white or black. Refer to BoardIndex.png for insight
+    int forwardDirection = (sideToMove == 'w')?-1:1;
+                            /* Capture piece */
+    if(file==0){ //A file
+        //As white, assume tile is 48. Capture can happen on 41
+        //As black, assume tile is 8. Capture can happen on 17
+        int targetSquare = 0;
+        if(sideToMove=='w') 
+            //White to move
+            targetSquare = squareIndex+forwardDirection*7;
+        else
+            //Black to move
+            targetSquare = squareIndex+forwardDirection*9;
+        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
+            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
+            legalMoves.emplace_back(capture);
+        }
+    }
+    if(file==7){ //H file
+        //As white, assume tile is 48. Capture can happen on 41
+        //As black, assume tile is 8. Capture can happen on 17
+        int targetSquare = 0;
+        if(sideToMove=='w')
+            targetSquare=squareIndex+forwardDirection*9;
+        else
+            targetSquare=squareIndex+forwardDirection*7;
+        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
+            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
+            legalMoves.emplace_back(capture);
+        }
+    }
+    if(rank==1){
+        //This piece is a pawn on its starting square
+                            /* Move up one tile */
+        int targetSquare = squareIndex+8;
+        if(targetSquare==EMPTY){
+            //Target square is empty so it is a legal move.
+            //Struct initialization with what kind of move was made
+            Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
+            legalMoves.emplace_back(pawn);
+        }
+                            /* Move up two tiles */
+        targetSquare = squareIndex+16;
+        if(targetSquare==EMPTY){
+            //Target square 2 tiles above starting piece is empty
+            Move pawn{squareIndex,targetSquare,PAWN,EMPTY,DOUBLE_PAWN_PUSH};
+            legalMoves.emplace_back(pawn);
+        }
+                            /* Capture a piece on the right or left side */
+        //TODO
+    }
+}
+/**
+ * Board:: since we are accessing a private array called squares 
+ * If squares were public we wouldn't need Board::
+*/
+std::vector<Move> Board::generateLegalMoves(char sideToMove){
+    std::vector<Move> legalMoves;
+
+    //Loop done from 0-64 to take advantage of 1D array and parallelize
+    for(int squareIndex=0;squareIndex<64;squareIndex++){
+        Piece piece = squares[squareIndex];
+        if(isColoredMove(sideToMove,piece)){
+            //If the tile we are currently on corresponds to the correct color piece to move
+            int rank = squareIndex/8;
+            int file = squareIndex % 8;
+            if(piece == PAWN){
+                validPawnmove(legalMoves,rank,file,squareIndex);          
+            }
+        }
+    }
+
+
+}
+
+bool isColoredMove(char sideToMove, const Piece&piece){
+    if(piece == 0)
+        return false;
+    if(sideToMove == 'w' && piece>=PAWN)
+        return true;
+    if(sideToMove == 'b' && piece<=BLACK_PAWN)
+        return false;
+    return false;
+
 }
 
 int main()
