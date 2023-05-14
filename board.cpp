@@ -182,6 +182,10 @@ void Board::printBoard(){
     }
 }
 
+Piece* Board::getSquares(){
+    return squares;
+}
+
 std::string Board::exportFEN() {
     std::string FEN = "";
     int emptyCount = 0;
@@ -346,6 +350,7 @@ void Board::validPawnmove(std::vector<Move> legalMoves, int rank, int file, int 
         }
     }
 }
+
 /**
  * Board:: since we are accessing a private array called squares 
  * If squares were public we wouldn't need Board::
@@ -369,7 +374,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
 
 }
 
-bool isColoredMove(char sideToMove, const Piece&piece){
+bool Board::isColoredMove(char sideToMove, const Piece&piece){
     if(piece == 0)
         return false;
     if(sideToMove == 'w' && piece>=PAWN)
@@ -380,11 +385,35 @@ bool isColoredMove(char sideToMove, const Piece&piece){
 
 }
 
+/**
+ * string notation of square and returns its value between 0-63
+*/
+int Board::algebraicToNumeric(std::string algebraic){
+    //Validate the input before parsing
+    if(algebraic.length()==2){
+        //Example of an algebraic representation of a square is e2
+        char file=algebraic[0];
+        char rank=algebraic[1];
+
+        //Validate rank and file numbers and letters
+        if((file>='a' && file<='h')&&(rank>='1' && rank<='8')){
+            int numericFile = file-'a';
+            int numericRank = rank-'1';
+
+            int squareIndex = numericRank*8+numericFile;
+            return squareIndex;
+        }
+        return -1;
+    }
+    return -1;
+}
+
 int main()
 {
     Board board;
     board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     board.printBoard();
     std::cout<<board.exportFEN()<<std::endl;
+    std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<std::endl;
     return 0;
 }
