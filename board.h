@@ -27,6 +27,26 @@ enum MoveType {
     INVALID        //Invalid move
 };
 
+/**
+ * Move information
+*/
+struct Move{
+    int sourceSquare;
+    int targetSquare;
+    Piece movedPiece;
+    Piece capturedPiece;
+    MoveType moveType;
+
+    Move(int source, int target, Piece moved, Piece captured, MoveType type){
+        sourceSquare = source;
+        targetSquare = target;
+        movedPiece = moved;
+        capturedPiece = captured;
+        moveType = type;
+    }
+
+};
+
 class Board {
     private:
         Piece squares[64];
@@ -47,6 +67,7 @@ class Board {
         Piece getPieceFromFENCharacter(char piece);
         void setupPositionFromFEN(const std::string& fen);
         void printBoard();
+        Piece* getSquares();
 
         // FEN-related functions
         std::string exportFEN();
@@ -60,29 +81,11 @@ class Board {
         std::vector<Move> generateLegalMoves(char sideToMove);
         bool isMoveLegal(const Move& move);
         //Helper function for if a piece corresponds to the right color
-        bool isColoredMove(char sideToMove, const Piece& piece);
+        bool isColoredMove(char sideToMove, const Piece&piece);
         void validPawnmove(std::vector<Move> legalMoves, int rank, int file, int squareIndex);
-};
+        int algebraicToNumeric(std::string algebraic);
+        std::string numericToAlgebraic(int squareIndex);
+};  
 
-
-        /**
-         * Move information
-        */
-        struct Move{
-            int sourceSquare;
-            int targetSquare;
-            Piece movedPiece;
-            Piece capturedPiece;
-            MoveType moveType;
-
-            Move(int source, int target, Piece moved, Piece captured, MoveType type){
-                sourceSquare = source;
-                targetSquare = target;
-                movedPiece = moved;
-                capturedPiece = captured;
-                moveType = type;
-            }
-
-        };
 
 #endif  // BOARD_H
