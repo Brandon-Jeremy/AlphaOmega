@@ -315,8 +315,7 @@ void Board::validPawnmove(std::vector<Move> legalMoves, int rank, int file, int 
             legalMoves.emplace_back(capture);
         }
     }
-    if(rank==1){
-        //This piece is a pawn on its starting square
+    if(rank==1){ //This piece is a pawn on its starting square
                             /* Move up one tile */
         int targetSquare = squareIndex+8;
         if(targetSquare==EMPTY){
@@ -333,7 +332,18 @@ void Board::validPawnmove(std::vector<Move> legalMoves, int rank, int file, int 
             legalMoves.emplace_back(pawn);
         }
                             /* Capture a piece on the right or left side */
-        //TODO
+        //Assume tile is 52, capture on the right is 45 as a pawn which is 43 as black
+        targetSquare = squareIndex+forwardDirection*7;
+        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
+            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
+            legalMoves.emplace_back(capture);
+        }
+        //Assume tile is 52, capture on the left is 43 as a pawn which is 45 as black
+        targetSquare = squareIndex+forwardDirection*9;
+        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
+            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
+            legalMoves.emplace_back(capture);
+        }
     }
 }
 /**
