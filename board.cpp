@@ -284,69 +284,106 @@ int Board::getFullMoveNumber(){
     return fullMoveNumber;
 }
 
-void Board::validPawnmove(std::vector<Move> legalMoves, int rank, int file, int squareIndex){
+void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
     //If the pawn is on the first rank, it has the chance to:
     //move once, move twice, capture if possible
 
     //This determines if we are moving forward as white or black. Refer to BoardIndex.png for insight
-    int forwardDirection = (sideToMove == 'w')?-1:1;
+    int forwardDirection = (sideToMove == 'w')?1:-1;
                             /* Capture piece */
     if(file==0){ //A file
         //As white, assume tile is 48. Capture can happen on 41
         //As black, assume tile is 8. Capture can happen on 17
         int targetSquare = 0;
-        if(sideToMove=='w') 
-            //White to move
-            targetSquare = squareIndex+forwardDirection*7;
+        if (sideToMove == 'w')
+            //white to capture
+            targetSquare = squareIndex + forwardDirection * 9;  // Capture to the right
         else
-            //Black to move
-            targetSquare = squareIndex+forwardDirection*9;
-        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
-            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
-            legalMoves.emplace_back(capture);
+            //black to capture
+            targetSquare = squareIndex + forwardDirection * 7;  // Capture to the left
+
+        if (targetSquare >= 0 && targetSquare <= 63) {
+            //target is still on the board
+            Piece capturedPiece = squares[targetSquare];
+
+            // Check if the captured piece is of the opposite color
+            if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0) {
+                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                std::cout << "Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(capture);
+            }
         }
     }
     if(file==7){ //H file
         //As white, assume tile is 48. Capture can happen on 41
         //As black, assume tile is 8. Capture can happen on 17
         int targetSquare = 0;
-        if(sideToMove=='w')
-            targetSquare=squareIndex+forwardDirection*9;
+        if (sideToMove == 'w')
+            //white to capture
+            targetSquare = squareIndex + forwardDirection * 9;  // Capture to the right
         else
-            targetSquare=squareIndex+forwardDirection*7;
-        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
-            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
-            legalMoves.emplace_back(capture);
+            //black to capture
+            targetSquare = squareIndex + forwardDirection * 7;  // Capture to the left
+
+        if (targetSquare >= 0 && targetSquare <= 63) {
+            //target is still on the board
+            Piece capturedPiece = squares[targetSquare];
+
+            // Check if the captured piece is of the opposite color
+            if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0) {
+                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                std::cout << "Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(capture);
+            }
         }
     }
-    if(rank==1){ //This piece is a pawn on its starting square
+    if(rank==1 || rank==6){ //This piece is a pawn on its starting square
                             /* Move up one tile */
-        int targetSquare = squareIndex+8;
-        if(targetSquare==EMPTY){
+        int targetSquare = squareIndex+forwardDirection*8;
+        if(squares[targetSquare]==EMPTY){
             //Target square is empty so it is a legal move.
             //Struct initialization with what kind of move was made
             Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
+            std::cout<<"Moving 1 tile up "<<squareIndex<<std::endl;
             legalMoves.emplace_back(pawn);
         }
                             /* Move up two tiles */
-        targetSquare = squareIndex+16;
-        if(targetSquare==EMPTY){
+        targetSquare = squareIndex+forwardDirection*16;
+        if(squares[targetSquare]==EMPTY){
             //Target square 2 tiles above starting piece is empty
             Move pawn{squareIndex,targetSquare,PAWN,EMPTY,DOUBLE_PAWN_PUSH};
+            std::cout<<"Moving 2 tiles up "<<squareIndex<<std::endl;
             legalMoves.emplace_back(pawn);
         }
+    }
+    else{
                             /* Capture a piece on the right or left side */
-        //Assume tile is 52, capture on the right is 45 as a pawn which is 43 as black
-        targetSquare = squareIndex+forwardDirection*7;
-        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
-            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
-            legalMoves.emplace_back(capture);
+        //Assume tile is 11, capture on the right is 20 as a pawn which is 2 as black
+        int targetSquare = squareIndex+forwardDirection*9;
+
+        if (targetSquare >= 0 && targetSquare <= 63) {
+            //target is still on the board
+            Piece capturedPiece = squares[targetSquare];
+
+            // Check if the captured piece is of the opposite color
+            if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0) {
+                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                std::cout << "Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(capture);
+            }
         }
-        //Assume tile is 52, capture on the left is 43 as a pawn which is 45 as black
-        targetSquare = squareIndex+forwardDirection*9;
-        if(targetSquare!=EMPTY && (targetSquare>=0 && targetSquare<=63)){
-            Move capture{squareIndex,targetSquare,PAWN,squares[targetSquare],CAPTURE};
-            legalMoves.emplace_back(capture);
+        //Assume tile is 11, capture on the left is 18 as a pawn which is 4 as black
+        targetSquare = squareIndex+forwardDirection*7;
+        if (targetSquare >= 0 && targetSquare <= 63) {
+            //target is still on the board
+            Piece capturedPiece = squares[targetSquare];
+
+            // Check if the captured piece is of the opposite color
+            if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0) {
+                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                std::cout << "Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(capture);
+            }
         }
     }
 }
@@ -414,6 +451,17 @@ int main()
     board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     board.printBoard();
     std::cout<<board.exportFEN()<<std::endl;
-    std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<std::endl;
+    std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<"\n\n\n"<<std::endl;
+
+    std::vector<Move> legalMoves;
+
+    legalMoves = board.generateLegalMoves('w');
+    // std::cout<<"Legal Moves: \n"<<std::endl;
+    // for (int i = 0; i < legalMoves.size(); i++)
+    // {
+    //     std::cout<<legalMoves[i].sourceSquare<<" "<<std::endl;
+    // }
+    
+
     return 0;
 }
