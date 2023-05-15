@@ -344,7 +344,7 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             //Target square is empty so it is a legal move.
             //Struct initialization with what kind of move was made
             Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
-            std::cout<<"Moving 1 tile up "<<squareIndex<<std::endl;
+            std::cout<<"Moving 1 tile up "<<pawn.targetSquare<<std::endl;
             legalMoves.emplace_back(pawn);
         }
                             /* Move up two tiles */
@@ -408,6 +408,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
         }
     }
 
+    return legalMoves;
 
 }
 
@@ -445,23 +446,44 @@ int Board::algebraicToNumeric(std::string algebraic){
     return -1;
 }
 
+std::string Board::numericToAlgebraic(int squareIndex){
+    /**
+     * Given a number to represent an index on the chess board, convert to human readable 
+     * notation
+     */
+    //Ensure the square index is within the valid range
+    if (squareIndex<0|| squareIndex>63) {
+        return "";
+    }
+
+    //Map the square index to algebraic notation
+    int rank = 8-(squareIndex/8);
+    int file = squareIndex%8;
+    std::string algebraic = "";
+    algebraic += ('a'+file);
+    algebraic += ('1'+rank);
+
+    return algebraic;
+}
+
 int main()
 {
     Board board;
     board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     board.printBoard();
     std::cout<<board.exportFEN()<<std::endl;
-    std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<"\n\n\n"<<std::endl;
+    // std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<"\n\n\n"<<std::endl;
 
     std::vector<Move> legalMoves;
 
     legalMoves = board.generateLegalMoves('w');
-    // std::cout<<"Legal Moves: \n"<<std::endl;
-    // for (int i = 0; i < legalMoves.size(); i++)
-    // {
-    //     std::cout<<legalMoves[i].sourceSquare<<" "<<std::endl;
-    // }
-    
+
+    for (const auto& move : legalMoves) {
+        std::cout << move.sourceSquare<< " ";
+    }
+    int num = board.algebraicToNumeric("e5");
+    std::string alg = board.numericToAlgebraic(num);
+    std::cout<<"\n"<<num<<" "<<alg<<std::endl;
 
     return 0;
 }
