@@ -395,8 +395,8 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             if(rank == 4 && sideToMove=='w'){
                 //White can only enPassant on the 4th rank.
                 int targetSquare = algebraicToNumeric(enPassantTargetSquare);
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
-                    int captured = squareIndex+forwardDirection*9;
+                int captured = squareIndex+forwardDirection*9;                
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
                     Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
                     legalMoves.emplace_back(enPassant);
                 }
@@ -404,8 +404,8 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             else if(rank==3 && sideToMove=='b'){
                 //Black can enPassant here
                 int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
-                    int captured = squareIndex+forwardDirection*7;
+                int captured = squareIndex+forwardDirection*9;                
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
                     Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
                     legalMoves.emplace_back(enPassant);
                 }
@@ -415,8 +415,8 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             if(rank == 4 && sideToMove=='w'){
                 //White can only enPassant on the 4th rank.
                 int targetSquare = algebraicToNumeric(enPassantTargetSquare);
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
-                    int captured = squareIndex+forwardDirection*7;
+                int captured = squareIndex+forwardDirection*9;                
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
                     Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
                     legalMoves.emplace_back(enPassant);
                 }
@@ -424,8 +424,8 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             else if(rank==3 && sideToMove=='b'){
                 //Black can enPassant here
                 int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
-                    int captured = squareIndex+forwardDirection*9;
+                int captured = squareIndex+forwardDirection*9;                
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
                     Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
                     legalMoves.emplace_back(enPassant);
                 }
