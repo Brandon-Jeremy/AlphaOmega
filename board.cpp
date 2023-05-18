@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <fstream>
 
 #include "board.h"
 
@@ -291,6 +292,23 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
 
     //This determines if we are moving forward as white or black. Refer to BoardIndex.png for insight
     int forwardDirection = (sideToMove == 'w')?1:-1;
+    std::cout<<"Current Rank: "<<rank<<std::endl;
+    std::cout<<"Current File: "<<file<<std::endl;
+
+    // ===================================================================
+
+                                /* Move up one tile */
+        int targetSquare = squareIndex+forwardDirection*8;
+        if(squares[targetSquare]==EMPTY){
+            //Target square is empty so it is a legal move.
+            //Struct initialization with what kind of move was made
+            Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
+            std::cout<<"Moving 1 tile up "<<squareIndex<<std::endl;
+            legalMoves.emplace_back(pawn);
+        }
+
+    // ===================================================================
+
                             /* Capture piece */
     if(file==0){ //A file
         //As white, assume tile is 48. Capture can happen on 41
@@ -340,15 +358,6 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
         }
     }
     if(rank==1 || rank==6){ //This piece is a pawn on its starting square
-                            /* Move up one tile */
-        int targetSquare = squareIndex+forwardDirection*8;
-        if(squares[targetSquare]==EMPTY){
-            //Target square is empty so it is a legal move.
-            //Struct initialization with what kind of move was made
-            Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
-            std::cout<<"Moving 1 tile up "<<pawn.targetSquare<<std::endl;
-            legalMoves.emplace_back(pawn);
-        }
                             /* Move up two tiles */
         targetSquare = squareIndex+forwardDirection*16;
         if(squares[targetSquare]==EMPTY){
@@ -391,49 +400,29 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
 
     //En Passant 
     if(enPassantTargetSquare!="-"){
-        if(file==0){
-            if(rank == 4 && sideToMove=='w'){
-                //White can only enPassant on the 4th rank.
-                int targetSquare = algebraicToNumeric(enPassantTargetSquare);
-                int captured = squareIndex+forwardDirection*9;                
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
-                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
-                    legalMoves.emplace_back(enPassant);
-                }
-            }
-            else if(rank==3 && sideToMove=='b'){
-                //Black can enPassant here
-                int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
-                int captured = squareIndex+forwardDirection*9;                
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
-                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
-                    legalMoves.emplace_back(enPassant);
-                }
+        if(sideToMove=='w'){
+            std::cout<<"EnPassant for white"<<std::endl;
+            //White can only enPassant on the 4th rank.
+            int targetSquare = algebraicToNumeric(enPassantTargetSquare);
+            int targetRank = targetSquare/8;
+            if(rank==targetRank-1){
+                Move enPassant{squareIndex,targetSquare,PAWN,PAWN,EN_PASSANT};
+                std::cout << "Adding capture enPassant: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(enPassant);
             }
         }
-        else if(file==7){
-            if(rank == 4 && sideToMove=='w'){
-                //White can only enPassant on the 4th rank.
-                int targetSquare = algebraicToNumeric(enPassantTargetSquare);
-                int captured = squareIndex+forwardDirection*9;                
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
-                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
-                    legalMoves.emplace_back(enPassant);
-                }
-            }
-            else if(rank==3 && sideToMove=='b'){
-                //Black can enPassant here
-                int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
-                int captured = squareIndex+forwardDirection*9;                
-                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN && squares[captured]==EMPTY){
-                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
-                    legalMoves.emplace_back(enPassant);
-                }
+        else if(sideToMove=='b'){
+            std::cout<<"EnPassant for BLACK"<<std::endl;
+            //Black can enPassant here
+            int targetSquare = algebraicToNumeric(enPassantTargetSquare);
+            int targetRank = targetSquare/8;
+            if(rank==targetRank+1){
+                Move enPassant{squareIndex,targetSquare,PAWN,PAWN,EN_PASSANT};
+                std::cout << "Adding capture enPassant: " << squareIndex << " to " << targetSquare << std::endl;
+                legalMoves.emplace_back(enPassant);
             }
             
         }
-        
-        
     }
 }
 
@@ -515,26 +504,75 @@ std::string Board::numericToAlgebraic(int squareIndex){
     return algebraic;
 }
 
+int Board::parseFEN(Board board){
+    std::ifstream file("testFEN.txt"); // Replace "filename.txt" with the actual name and path of your file
+    if (!file.is_open()) {
+        std::cout << "Failed to open the file." << std::endl;
+        return 1; // Exit the program if the file cannot be opened
+    }
+
+    std::string line;
+    bool proceed = true;
+    while (std::getline(file, line) && proceed) {
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back(); // Remove the carriage return character '\r' if present
+        }
+        if (!line.empty() && line.back() == '\n') {
+            line.pop_back(); // Remove the newline character '\n' if present
+        }
+        
+        // Process each line here
+        std::cout << line << std::endl;
+
+        // Store the line in a string variable
+        std::string storedLine = line;
+
+        board.setupPositionFromFEN(storedLine);
+        board.printBoard();
+
+        std::vector<Move> legalMoves;
+
+        legalMoves = board.generateLegalMoves('w');
+
+        for (const auto& move : legalMoves) {
+            std::cout << move.sourceSquare<< " ";
+        }
+
+
+        std::cout << "Continue?";
+        std::cin >> proceed;
+        if(!proceed){
+            break;
+        }
+        // Clear the line variable for the next iteration
+        line.clear();
+    }
+
+    file.close();
+    return 0;
+}
+
 int main()
 {
     Board board;
-    board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    board.printBoard();
-    std::cout<<board.exportFEN()<<std::endl;
-    // std::cout<<"Square index 56 corresponds to a "<<board.getSquares()[56]<<"\n\n\n"<<std::endl;
+    // board.setupPositionFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    // board.printBoard();
 
-    std::vector<Move> legalMoves;
+    board.parseFEN(board);
+    // std::cout<<board.exportFEN()<<std::endl;
 
-    legalMoves = board.generateLegalMoves('w');
+    // std::vector<Move> legalMoves;
 
-    for (const auto& move : legalMoves) {
-        std::cout << move.sourceSquare<< " ";
-    }
-    int num = board.algebraicToNumeric("e5");
-    std::string alg = board.numericToAlgebraic(num);
-    std::cout<<"\n"<<num<<" "<<alg<<std::endl;
+    // legalMoves = board.generateLegalMoves('w');
 
-    std::cout<<"\n"<<board.getEnPassantTargetSquare()<<std::endl;
+    // for (const auto& move : legalMoves) {
+    //     std::cout << move.sourceSquare<< " ";
+    // }
+    // int num = board.algebraicToNumeric("e5");
+    // std::string alg = board.numericToAlgebraic(num);
+    // std::cout<<"\n"<<num<<" "<<alg<<std::endl;
+
+    // std::cout<<"\n"<<board.getEnPassantTargetSquare()<<std::endl;
 
     return 0;
 }

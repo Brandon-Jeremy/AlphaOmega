@@ -68,6 +68,7 @@ class Board {
         void setupPositionFromFEN(const std::string& fen);
         void printBoard();
         Piece* getSquares();
+        int parseFEN(Board board);
 
         // FEN-related functions
         std::string exportFEN();
