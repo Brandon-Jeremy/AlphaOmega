@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "board.h"
 
@@ -313,6 +314,7 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
                 legalMoves.emplace_back(capture);
             }
         }
+
     }
     if(file==7){ //H file
         //As white, assume tile is 48. Capture can happen on 41
@@ -320,10 +322,10 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
         int targetSquare = 0;
         if (sideToMove == 'w')
             //white to capture
-            targetSquare = squareIndex + forwardDirection * 9;  // Capture to the right
+            targetSquare = squareIndex + forwardDirection * 7;  // Capture to the left
         else
             //black to capture
-            targetSquare = squareIndex + forwardDirection * 7;  // Capture to the left
+            targetSquare = squareIndex + forwardDirection * 14;  // Capture to the right
 
         if (targetSquare >= 0 && targetSquare <= 63) {
             //target is still on the board
@@ -385,6 +387,53 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
                 legalMoves.emplace_back(capture);
             }
         }
+    }
+
+    //En Passant 
+    if(enPassantTargetSquare!="-"){
+        if(file==0){
+            if(rank == 4 && sideToMove=='w'){
+                //White can only enPassant on the 4th rank.
+                int targetSquare = algebraicToNumeric(enPassantTargetSquare);
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
+                    int captured = squareIndex+forwardDirection*9;
+                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
+                    legalMoves.emplace_back(enPassant);
+                }
+            }
+            else if(rank==3 && sideToMove=='b'){
+                //Black can enPassant here
+                int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
+                    int captured = squareIndex+forwardDirection*7;
+                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
+                    legalMoves.emplace_back(enPassant);
+                }
+            }
+        }
+        else if(file==7){
+            if(rank == 4 && sideToMove=='w'){
+                //White can only enPassant on the 4th rank.
+                int targetSquare = algebraicToNumeric(enPassantTargetSquare);
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
+                    int captured = squareIndex+forwardDirection*7;
+                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
+                    legalMoves.emplace_back(enPassant);
+                }
+            }
+            else if(rank==3 && sideToMove=='b'){
+                //Black can enPassant here
+                int targetSquare=squareIndex = algebraicToNumeric(enPassantTargetSquare);
+                if(targetSquare==squareIndex+1 && squares[targetSquare]==PAWN){
+                    int captured = squareIndex+forwardDirection*9;
+                    Move enPassant{squareIndex,captured,PAWN,PAWN,EN_PASSANT};
+                    legalMoves.emplace_back(enPassant);
+                }
+            }
+            
+        }
+        
+        
     }
 }
 
@@ -484,6 +533,8 @@ int main()
     int num = board.algebraicToNumeric("e5");
     std::string alg = board.numericToAlgebraic(num);
     std::cout<<"\n"<<num<<" "<<alg<<std::endl;
+
+    std::cout<<"\n"<<board.getEnPassantTargetSquare()<<std::endl;
 
     return 0;
 }
