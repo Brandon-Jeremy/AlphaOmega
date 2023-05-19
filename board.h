@@ -24,6 +24,7 @@ enum MoveType {
     PROMOTION,     //Pawn promotion move
     EN_PASSANT,    //En passant move
     CAPTURE,       //Capturing move
+    PROMOTION_CAPTURE,  //Capture and promote
     INVALID        //Invalid move
 };
 
@@ -36,6 +37,7 @@ struct Move{
     Piece movedPiece;
     Piece capturedPiece;
     MoveType moveType;
+    Piece promotedPiece;
 
     Move(int source, int target, Piece moved, Piece captured, MoveType type){
         sourceSquare = source;
@@ -43,6 +45,7 @@ struct Move{
         movedPiece = moved;
         capturedPiece = captured;
         moveType = type;
+        promotedPiece = EMPTY;
     }
 
 };

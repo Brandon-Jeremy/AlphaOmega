@@ -301,10 +301,35 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
     if(squares[targetSquare]==EMPTY){
         //Target square is empty so it is a legal move.
         //Struct initialization with what kind of move was made
-        Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
-        std::cout<<"[1] Moving 1 tile up "<<squareIndex<<std::endl;
-        legalMoves.emplace_back(pawn);
-    }
+        int targetRank = targetSquare/8;
+        if(sideToMove=='w'){
+            if(targetRank==7){
+                for (Piece promotionPiece : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                    Move promotionMove{squareIndex, targetSquare, PAWN, EMPTY, PROMOTION};
+                    promotionMove.promotedPiece = promotionPiece;
+                    legalMoves.emplace_back(promotionMove);
+                }
+            }
+            else{
+                Move pawn{squareIndex,targetSquare,PAWN,EMPTY,NORMAL};
+                legalMoves.emplace_back(pawn);
+            }
+        }
+        else{
+            if(targetRank==0){
+                for (Piece promotionPiece : {BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT}) {
+                    Move promotionMove{squareIndex, targetSquare, PAWN, EMPTY, PROMOTION};
+                    promotionMove.promotedPiece = promotionPiece;
+                    legalMoves.emplace_back(promotionMove);
+                }
+            }
+            else{
+                Move pawn{squareIndex,targetSquare,BLACK_PAWN,EMPTY,NORMAL};
+                legalMoves.emplace_back(pawn);
+            }
+        }
+            std::cout<<"[1] Moving 1 tile up "<<squareIndex<<std::endl;
+    }                
 
     // ===================================================================
 
@@ -327,9 +352,15 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
 
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
-                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                if(sideToMove=='w'){
+                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }
+                else{
+                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }                
                 std::cout << "[2] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
-                legalMoves.emplace_back(capture);
             }
         }
 
@@ -350,12 +381,17 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             Piece capturedPiece = squares[targetSquare];
             int targetRank = targetSquare/8;
 
-
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
-                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                if(sideToMove=='w'){
+                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }
+                else{
+                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }                
                 std::cout << "[3] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
-                legalMoves.emplace_back(capture);
             }
         }
     }
@@ -372,9 +408,15 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
 
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
-                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                if(sideToMove=='w'){
+                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }
+                else{
+                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }                
                 std::cout << "[5] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
-                legalMoves.emplace_back(capture);
             }
         }
         //Assume tile is 11, capture on the left is 18 as a pawn which is 4 as black
@@ -386,9 +428,15 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
 
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
-                Move capture{squareIndex, targetSquare, PAWN, capturedPiece, CAPTURE};
+                if(sideToMove=='w'){
+                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }
+                else{
+                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                    legalMoves.emplace_back(capture);
+                }                
                 std::cout << "[6] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
-                legalMoves.emplace_back(capture);
             }
         }
     }
@@ -397,9 +445,15 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
         targetSquare = squareIndex+forwardDirection*16;
         if(squares[targetSquare]==EMPTY){
             //Target square 2 tiles above starting piece is empty
-            Move pawn{squareIndex,targetSquare,PAWN,EMPTY,DOUBLE_PAWN_PUSH};
+            if(sideToMove=='w'){
+                Move pawn{squareIndex,targetSquare,PAWN,EMPTY,DOUBLE_PAWN_PUSH};
+                legalMoves.emplace_back(pawn);
+            }
+            else{
+                Move pawn{squareIndex,targetSquare,BLACK_PAWN,EMPTY,DOUBLE_PAWN_PUSH};
+                legalMoves.emplace_back(pawn);
+            }
             std::cout<<"[4] Moving 2 tiles up "<<squareIndex<<std::endl;
-            legalMoves.emplace_back(pawn);
         }
     }
 
@@ -411,7 +465,7 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             int targetSquare = algebraicToNumeric(enPassantTargetSquare);
             int targetRank = targetSquare/8;
             if(rank==targetRank-1){
-                Move enPassant{squareIndex,targetSquare,PAWN,PAWN,EN_PASSANT};
+                Move enPassant{squareIndex,targetSquare,PAWN,BLACK_PAWN,EN_PASSANT};
                 std::cout << "[7] Adding capture enPassant: " << squareIndex << " to " << targetSquare << std::endl;
                 legalMoves.emplace_back(enPassant);
             }
@@ -421,7 +475,7 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             int targetSquare = algebraicToNumeric(enPassantTargetSquare);
             int targetRank = targetSquare/8;
             if(rank==targetRank+1){
-                Move enPassant{squareIndex,targetSquare,PAWN,PAWN,EN_PASSANT};
+                Move enPassant{squareIndex,targetSquare,BLACK_PAWN,PAWN,EN_PASSANT};
                 std::cout << "[8B] Adding capture enPassant: " << squareIndex << " to " << targetSquare << std::endl;
                 legalMoves.emplace_back(enPassant);
             }
