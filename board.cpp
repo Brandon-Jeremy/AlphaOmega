@@ -538,6 +538,52 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
     }
 }
 
+void Board::validBishopMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
+    int directions[4] = {9, 7, -9, -7};
+    //up-right, up-left, down-right, down-left
+
+    for(int direction:directions){
+        int currentSquare = squareIndex;
+        int targetSquare = currentSquare+direction;
+
+        while (isValidSquare(targetSquare) && !isEdgeFile(currentSquare, direction)){
+            if (squares[targetSquare] == EMPTY){
+                Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
+                std::cout<<"Bishop moved from "<<squareIndex<<" to "<<targetSquare<<std::endl;
+                legalMoves.emplace_back(normalMove);
+            }
+            else if (isOpponentPiece(targetSquare)){
+                Piece capturedPiece = squares[targetSquare];
+                Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
+                std::cout<<"[Capture] Bishop moved from "<<squareIndex<<" to "<<targetSquare<<std::endl;
+                legalMoves.emplace_back(captureMove);
+                break;  //Cannot move further in this direction
+            }
+            else{
+                break;  //Encountered own piece
+            }
+
+            currentSquare = targetSquare;
+            targetSquare += direction;
+        }
+    }
+}
+
+bool Board::isValidSquare(int squareIndex){
+    return squareIndex >= 0 && squareIndex < 64;
+}
+
+bool Board::isOpponentPiece(int squareIndex){
+    Piece piece = squares[squareIndex];
+    return (sideToMove == 'w' && piece < 0) || (sideToMove == 'b' && piece > 0);
+}
+
+bool Board::isEdgeFile(int squareIndex, int direction){
+    int currentFile = squareIndex % 8;
+    int targetFile = (squareIndex + direction) % 8;
+    return (currentFile == 0 && targetFile == 7) || (currentFile == 7 && targetFile == 0);
+}
+
 /**
  * Board:: since we are accessing a private array called squares 
  * If squares were public we wouldn't need Board::
@@ -556,7 +602,11 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
             int file = squareIndex % 8;
             if(piece == PAWN){
                 std::cout<<"White Pawn found on "<<rank<<" "<<file<<std::endl;
-                validPawnmove(legalMoves,rank,file,squareIndex);          
+                validPawnmove(legalMoves,rank,file,squareIndex);
+            }
+            else if(piece == BISHOP){
+                std::cout<<"White Bishop found on "<<rank<<" "<<file<<std::endl;
+                validBishopMove(legalMoves,rank,file,squareIndex);
             }
         }
         else{
@@ -565,6 +615,10 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
             if(piece == BLACK_PAWN){
                 std::cout<<"Black Pawn found on "<<rank<<" "<<file<<std::endl;
                 validPawnmove(legalMoves,rank,file,squareIndex);          
+            }
+            else if(piece == BLACK_BISHOP){
+                std::cout<<"Black Bishop found on "<<rank<<" "<<file<<std::endl;
+                validBishopMove(legalMoves,rank,file,squareIndex);
             }
         }
     }

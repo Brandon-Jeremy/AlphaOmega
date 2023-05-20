@@ -87,8 +87,13 @@ class Board {
         //Helper function for if a piece corresponds to the right color
         bool isColoredMove(char sideToMove, const Piece&piece);
         void validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
+        void validBishopMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
+
+        bool isValidSquare(int squareIndex);
+        bool isOpponentPiece(int squareIndex);
+        bool isEdgeFile(int squareIndex, int direction);
 };  
 
 
