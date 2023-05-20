@@ -353,12 +353,30 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
                 if(sideToMove=='w'){
-                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==7){
+                        for (Piece promotionPiece : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{               
+                        Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }
                 else{
-                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==0){
+                        for (Piece promotionPiece : {BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{
+                        Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }                
                 std::cout << "[2] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
             }
@@ -384,12 +402,30 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
                 if(sideToMove=='w'){
-                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==7){
+                        for (Piece promotionPiece : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{
+                        Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }
                 else{
-                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==0){
+                        for (Piece promotionPiece : {BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{
+                        Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }                
                 std::cout << "[3] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
             }
@@ -429,12 +465,30 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
             // Check if the captured piece is of the opposite color
             if (capturedPiece != EMPTY && capturedPiece * forwardDirection < 0 && targetRank!=rank) {
                 if(sideToMove=='w'){
-                    Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==7){
+                        for (Piece promotionPiece : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{
+                        Move capture{squareIndex,targetSquare,PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }
                 else{
-                    Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
-                    legalMoves.emplace_back(capture);
+                    if(targetRank==0){
+                        for (Piece promotionPiece : {BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT}) {
+                            Move promotionMove{squareIndex, targetSquare, PAWN, capturedPiece, PROMOTION_CAPTURE};
+                            promotionMove.promotedPiece = promotionPiece;
+                            legalMoves.emplace_back(promotionMove);
+                        }
+                    }
+                    else{
+                        Move capture{squareIndex,targetSquare,BLACK_PAWN,capturedPiece,CAPTURE};
+                        legalMoves.emplace_back(capture);
+                    }
                 }                
                 std::cout << "[6] Adding capture: " << squareIndex << " to " << targetSquare << std::endl;
             }
