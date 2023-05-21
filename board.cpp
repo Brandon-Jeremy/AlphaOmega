@@ -497,7 +497,8 @@ void Board::validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int
     if(rank==1 || rank==6){ //This piece is a pawn on its starting square
                             /* Move up two tiles */
         targetSquare = squareIndex+forwardDirection*16;
-        if(squares[targetSquare]==EMPTY){
+        int singleSquarePush = squareIndex+forwardDirection*8;
+        if(squares[targetSquare]==EMPTY && squares[singleSquarePush]==EMPTY){
             //Target square 2 tiles above starting piece is empty
             if(sideToMove=='w'){
                 Move pawn{squareIndex,targetSquare,PAWN,EMPTY,DOUBLE_PAWN_PUSH};
@@ -546,7 +547,7 @@ void Board::validBishopMove(std::vector<Move>& legalMoves, int rank, int file, i
         int currentSquare = squareIndex;
         int targetSquare = currentSquare+direction;
 
-        while (isValidSquare(targetSquare) && !isEdgeFile(currentSquare, direction)){
+        while (isValidSquare(targetSquare) && !isEdgeFile_Bishop(currentSquare, direction)){
             if (squares[targetSquare] == EMPTY){
                 Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
                 std::cout<<"Bishop moved from "<<squareIndex<<" to "<<targetSquare<<std::endl;
@@ -569,6 +570,33 @@ void Board::validBishopMove(std::vector<Move>& legalMoves, int rank, int file, i
     }
 }
 
+void Board::validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex) {
+    int knightOffset[8] = {-17, -15, -10, -6, 6, 10, 15, 17};
+
+    for (int offset:knightOffset){
+        int currentSquare = squareIndex;
+        int targetSquare = currentSquare + offset;
+
+        // Check if the target square is within the valid range of the board
+        if (isValidSquare(targetSquare) && isValidKnightTarget(currentSquare, targetSquare)){
+            //Target square is empty and we can occupy it
+            if (squares[targetSquare] == EMPTY){
+                Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
+                legalMoves.emplace_back(normalMove);
+                std::cout << "Moving knight from " << currentSquare << " to " << targetSquare << std::endl;
+            }
+            //Target square is occupied by opponent's piece
+            else if (isOpponentPiece(targetSquare)){
+                Piece capturedPiece = squares[targetSquare];
+                Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
+                legalMoves.emplace_back(captureMove);
+                std::cout << "[Capture] Knight moved from " << squareIndex << " to " << targetSquare << std::endl;
+            }
+        }
+    }
+}
+
+
 bool Board::isValidSquare(int squareIndex){
     return squareIndex >= 0 && squareIndex < 64;
 }
@@ -578,10 +606,23 @@ bool Board::isOpponentPiece(int squareIndex){
     return (sideToMove == 'w' && piece < 0) || (sideToMove == 'b' && piece > 0);
 }
 
-bool Board::isEdgeFile(int squareIndex, int direction){
+bool Board::isEdgeFile_Bishop(int squareIndex, int direction){
     int currentFile = squareIndex % 8;
     int targetFile = (squareIndex + direction) % 8;
     return (currentFile == 0 && targetFile == 7) || (currentFile == 7 && targetFile == 0);
+}
+
+bool Board::isValidKnightTarget(int sourceSquare, int targetSquare){
+    int sourceRank = sourceSquare/8;
+    int sourceFile = sourceSquare%8;
+    int targetRank = targetSquare/8;
+    int targetFile = targetSquare%8;
+
+    //Knight moves can only occur within a range of two ranks and one file in any direction
+    int rankDiff = std::abs(sourceRank - targetRank);
+    int fileDiff = std::abs(sourceFile - targetFile);
+
+    return rankDiff <= 2 && fileDiff <= 2 && rankDiff + fileDiff == 3;
 }
 
 /**
@@ -608,6 +649,11 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                 std::cout<<"White Bishop found on "<<rank<<" "<<file<<std::endl;
                 validBishopMove(legalMoves,rank,file,squareIndex);
             }
+            else if(piece == KNIGHT){
+                std::cout<<"White Knight found on "<<rank<<" "<<file<<std::endl;
+                validKnightMove(legalMoves,rank,file,squareIndex);
+
+            }
         }
         else{
             int rank = squareIndex/8;
@@ -619,6 +665,11 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
             else if(piece == BLACK_BISHOP){
                 std::cout<<"Black Bishop found on "<<rank<<" "<<file<<std::endl;
                 validBishopMove(legalMoves,rank,file,squareIndex);
+            }
+            else if(piece == BLACK_KNIGHT){
+                std::cout<<"Black Knight found on "<<rank<<" "<<file<<std::endl;
+                validKnightMove(legalMoves,rank,file,squareIndex);
+
             }
         }
     }

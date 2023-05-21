@@ -88,12 +88,14 @@ class Board {
         bool isColoredMove(char sideToMove, const Piece&piece);
         void validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validBishopMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
+        void validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
 
         bool isValidSquare(int squareIndex);
         bool isOpponentPiece(int squareIndex);
-        bool isEdgeFile(int squareIndex, int direction);
+        bool isEdgeFile_Bishop(int squareIndex, int direction);
+        bool isValidKnightTarget(int squareIndex, int direction);
 };  
 
 
