@@ -632,50 +632,39 @@ bool Board::isValidKnightTarget(int sourceSquare, int targetSquare){
 std::vector<Move> Board::generateLegalMoves(char sideToMove){
     std::vector<Move> legalMoves;
 
-    std::cout<<"Side to move is "<<sideToMove<<std::endl;
-
     //Loop done from 0-64 to take advantage of 1D array and parallelize
     for(int squareIndex=0;squareIndex<64;squareIndex++){
         Piece piece = squares[squareIndex];
+        int rank = squareIndex/8;
+        int file = squareIndex % 8;
         if(sideToMove=='w'){
-            //If the tile we are currently on corresponds to the correct color piece to move
-            int rank = squareIndex/8;
-            int file = squareIndex % 8;
-            if(piece == PAWN){
-                std::cout<<"White Pawn found on "<<rank<<" "<<file<<std::endl;
-                validPawnmove(legalMoves,rank,file,squareIndex);
-            }
-            else if(piece == BISHOP){
-                std::cout<<"White Bishop found on "<<rank<<" "<<file<<std::endl;
-                validBishopMove(legalMoves,rank,file,squareIndex);
-            }
-            else if(piece == KNIGHT){
-                std::cout<<"White Knight found on "<<rank<<" "<<file<<std::endl;
-                validKnightMove(legalMoves,rank,file,squareIndex);
-
+            switch(piece){
+                case PAWN:
+                    validPawnmove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BISHOP:
+                    validBishopMove(legalMoves,rank,file,squareIndex);
+                    break;
+                case KNIGHT:
+                    validKnightMove(legalMoves,rank,file,squareIndex);
+                    break;
             }
         }
         else{
-            int rank = squareIndex/8;
-            int file = squareIndex % 8;
-            if(piece == BLACK_PAWN){
-                std::cout<<"Black Pawn found on "<<rank<<" "<<file<<std::endl;
-                validPawnmove(legalMoves,rank,file,squareIndex);          
-            }
-            else if(piece == BLACK_BISHOP){
-                std::cout<<"Black Bishop found on "<<rank<<" "<<file<<std::endl;
-                validBishopMove(legalMoves,rank,file,squareIndex);
-            }
-            else if(piece == BLACK_KNIGHT){
-                std::cout<<"Black Knight found on "<<rank<<" "<<file<<std::endl;
-                validKnightMove(legalMoves,rank,file,squareIndex);
-
+            switch(piece){
+                case BLACK_PAWN:
+                    validPawnmove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BLACK_BISHOP:
+                    validBishopMove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BLACK_KNIGHT:
+                    validKnightMove(legalMoves,rank,file,squareIndex);
+                    break;
             }
         }
     }
-
     return legalMoves;
-
 }
 
 bool Board::isColoredMove(char sideToMove, const Piece&piece){
