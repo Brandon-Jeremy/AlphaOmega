@@ -91,6 +91,7 @@ class Board {
         void validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validRookMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validQueenMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
+        void validKingMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
 

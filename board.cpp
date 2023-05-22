@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <chrono>
+#include <omp.h>
 
 #include "board.h"
 
@@ -670,6 +672,31 @@ void Board::validQueenMove(std::vector<Move>& legalMoves, int rank, int file, in
     }
 }
 
+void Board::validKingMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
+    int kingOffsets[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
+
+    for (int offset:kingOffsets){
+        int currentSquare = squareIndex;
+        int targetSquare = currentSquare + offset;
+
+        //Check if the target square is a valid square on the board
+        if (isValidSquare(targetSquare)){
+            int targetRank = targetSquare/8;
+            int targetFile = targetSquare%8;
+
+            // Check if the target square is within the board boundaries and doesn't loop from file 0 to file 7
+            if (targetRank >= 0 && targetRank <= 7 && targetFile >= 0 && targetFile <= 7 && abs(targetFile - file) <= 1){
+                //Target square is empty or occupied by opponent's piece
+                if (squares[targetSquare]==EMPTY || isOpponentPiece(targetSquare)){
+                    Move move{squareIndex, targetSquare, squares[squareIndex], squares[targetSquare], NORMAL};
+                    legalMoves.emplace_back(move);
+                    std::cout << "King moved from "<<squareIndex <<" to " <<targetSquare<<std::endl;
+                }
+            }
+        }
+    }
+}
+
 
 bool Board::isValidSquare(int squareIndex){
     return squareIndex >= 0 && squareIndex < 64;
@@ -707,6 +734,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
     std::vector<Move> legalMoves;
 
     //Loop done from 0-64 to take advantage of 1D array and parallelize
+    #pragma omp parallel for
     for(int squareIndex=0;squareIndex<64;squareIndex++){
         Piece piece = squares[squareIndex];
         int rank = squareIndex/8;
@@ -835,12 +863,17 @@ int Board::parseFEN(Board board){
 
         std::vector<Move> legalMoves;
 
+        auto startTime = std::chrono::steady_clock::now();
+
         legalMoves = board.generateLegalMoves(board.sideToMove);
 
         for (const auto& move : legalMoves) {
             std::cout << move.sourceSquare<< " ";
         }
-
+        auto endTime = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+        
+        std::cout << "\nExecution time: " << duration << " ms\n" << std::endl;
 
         std::cout << "\nContinue?";
         std::cin >> proceed;
