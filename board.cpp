@@ -652,9 +652,11 @@ void Board::validQueenMove(std::vector<Move>& legalMoves, int rank, int file, in
 
             if (squares[targetSquare] == EMPTY){
                 Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
+                std::cout<<"Moving Queen from "<<squareIndex<<" to "<<targetSquare<<std::endl;
                 legalMoves.push_back(normalMove);
             } else if (isOpponentPiece(targetSquare)){
                 Piece capturedPiece = squares[targetSquare];
+                std::cout<<"[Capture] Moving Queen from "<<squareIndex<<" to "<<targetSquare<<std::endl;
                 Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
                 legalMoves.push_back(captureMove);
                 break;
@@ -723,6 +725,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                 case ROOK:
                     validRookMove(legalMoves,rank,file,squareIndex);
                     break;
+                case QUEEN:
+                    validQueenMove(legalMoves,rank,file,squareIndex);
+                    break;
             }
         }
         else{
@@ -738,6 +743,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     break;
                 case BLACK_ROOK:
                     validRookMove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BLACK_QUEEN:
+                    validQueenMove(legalMoves,rank,file,squareIndex);
                     break;
             }
         }
