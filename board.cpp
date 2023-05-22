@@ -609,7 +609,7 @@ void Board::validRookMove(std::vector<Move>& legalMoves, int rank, int file, int
             if ((targetSquare / 8) != (currentSquare / 8) && (targetSquare % 8) != (currentSquare % 8)) {
                 break;  // Reached the edge of the board in the current direction, stop moving
             }
-            
+
             if (squares[targetSquare] == EMPTY) {
                 Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
                 std::cout<<"Moving rook from "<<squareIndex<<" to "<<targetSquare<<std::endl;
@@ -635,6 +635,39 @@ void Board::validRookMove(std::vector<Move>& legalMoves, int rank, int file, int
         }
     }
 }
+
+void Board::validQueenMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
+    int queenDirections[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
+
+    for (int direction : queenDirections){
+        int currentSquare = squareIndex;
+        int targetSquare = currentSquare + direction;
+
+        while (isValidSquare(targetSquare)){
+            //Check if the target square is on a different rank, file, or diagonal
+            if ((targetSquare / 8) != (currentSquare / 8) && (targetSquare % 8) != (currentSquare % 8) &&
+                std::abs(targetSquare / 8 - currentSquare / 8) != std::abs(targetSquare % 8 - currentSquare % 8)) {
+                break;  //Reached the edge of the board in the current direction, stop moving
+            }
+
+            if (squares[targetSquare] == EMPTY){
+                Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
+                legalMoves.push_back(normalMove);
+            } else if (isOpponentPiece(targetSquare)){
+                Piece capturedPiece = squares[targetSquare];
+                Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
+                legalMoves.push_back(captureMove);
+                break;
+            } else{
+                break;
+            }
+
+            currentSquare = targetSquare;
+            targetSquare += direction;
+        }
+    }
+}
+
 
 bool Board::isValidSquare(int squareIndex){
     return squareIndex >= 0 && squareIndex < 64;
