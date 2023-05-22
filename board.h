@@ -53,6 +53,8 @@ struct Move{
 class Board {
     private:
         Piece squares[64];
+        int whiteKingSquare;
+        int blackKingSquare;
 
         //Fen information
         char sideToMove;
@@ -73,6 +75,9 @@ class Board {
         Piece* getSquares();
         int parseFEN(Board board);
 
+        bool isKingInCheck(char sideToMove);
+        void updateKingSquare(int squareIndex, char side);
+
         // FEN-related functions
         std::string exportFEN();
         std::string getSideToMove();
@@ -92,6 +97,7 @@ class Board {
         void validRookMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validQueenMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validKingMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
+        bool isAdjacentToKing(int squareIndex);
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
 

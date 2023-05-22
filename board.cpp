@@ -5,7 +5,6 @@
 #include <cmath>
 #include <fstream>
 #include <chrono>
-#include <omp.h>
 
 #include "board.h"
 
@@ -47,6 +46,12 @@ Piece Board::getPiece(int file, int rank){
 
 void Board::setPiece(int rank, int file, Piece piece){
     int index = rank*8+file;
+    if(piece == KING){
+        whiteKingSquare = index;
+    }
+    else if(piece == BLACK_KING){
+        blackKingSquare = index;
+    }
     squares[index]=piece;
 }
 
@@ -113,7 +118,6 @@ void Board::setupPositionFromFEN(const std::string& fen){
             file += emptySquares;
         }
         else{
-
             Piece p = getPieceFromFENCharacter(piece);
             std::cout<<"Setting up board with piece "<<p<<" using piece "<<piece<<std::endl;
             setPiece(rank, file, p);
@@ -684,17 +688,49 @@ void Board::validKingMove(std::vector<Move>& legalMoves, int rank, int file, int
             int targetRank = targetSquare/8;
             int targetFile = targetSquare%8;
 
-            // Check if the target square is within the board boundaries and doesn't loop from file 0 to file 7
-            if (targetRank >= 0 && targetRank <= 7 && targetFile >= 0 && targetFile <= 7 && abs(targetFile - file) <= 1){
-                //Target square is empty or occupied by opponent's piece
-                if (squares[targetSquare]==EMPTY || isOpponentPiece(targetSquare)){
-                    Move move{squareIndex, targetSquare, squares[squareIndex], squares[targetSquare], NORMAL};
-                    legalMoves.emplace_back(move);
-                    std::cout << "King moved from "<<squareIndex <<" to " <<targetSquare<<std::endl;
+            //Check if the target square doesn't loop from file 0 to file 7
+            if (abs(targetFile - file) <= 1){
+                // Target square is empty or occupied by opponent's piece
+                if (squares[targetSquare] == EMPTY){
+                    //Check if the target square is not adjacent to a king
+                    if (!isAdjacentToKing(targetSquare)) {
+                        Move move{squareIndex, targetSquare, squares[squareIndex], squares[targetSquare], NORMAL};
+                        legalMoves.emplace_back(move);
+                        std::cout << "King moved from " << squareIndex << " to " << targetSquare << std::endl;
+                    }
+                }
+                else{
+                    if(isOpponentPiece(targetSquare)){
+                        if (!isAdjacentToKing(targetSquare)) {
+                            Move move{squareIndex, targetSquare, squares[squareIndex], squares[targetSquare], CAPTURE};
+                            legalMoves.emplace_back(move);
+                            std::cout << "[Capture] King moved from " << squareIndex << " to " << targetSquare << std::endl;
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+bool Board::isAdjacentToKing(int squareIndex) {
+    //Define the possible offsets for adjacent squares
+    int adjacentOffsets[8] = {-9, -8, -7, -1, 1, 7, 8, 9};
+
+    //Iterate through the adjacent offsets
+    for (int offset : adjacentOffsets) {
+        int targetSquare = squareIndex + offset;
+
+        //Check if the target square is a valid square on the board
+        if (isValidSquare(targetSquare)) {
+            //Check if the target square contains a king
+            if (squares[targetSquare] == KING || squares[targetSquare] == BLACK_KING) {
+                return true; //The square is adjacent to a king
+            }
+        }
+    }
+
+    return false; //No adjacent king found
 }
 
 
@@ -734,7 +770,6 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
     std::vector<Move> legalMoves;
 
     //Loop done from 0-64 to take advantage of 1D array and parallelize
-    #pragma omp parallel for
     for(int squareIndex=0;squareIndex<64;squareIndex++){
         Piece piece = squares[squareIndex];
         int rank = squareIndex/8;
