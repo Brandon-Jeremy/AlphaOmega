@@ -756,6 +756,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                 case QUEEN:
                     validQueenMove(legalMoves,rank,file,squareIndex);
                     break;
+                case KING:
+                    validKingMove(legalMoves,rank,file,squareIndex);
+                    break;
             }
         }
         else{
@@ -774,6 +777,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     break;
                 case BLACK_QUEEN:
                     validQueenMove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BLACK_KING:
+                    validKingMove(legalMoves,rank,file,squareIndex);
                     break;
             }
         }
