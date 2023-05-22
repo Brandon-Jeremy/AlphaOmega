@@ -570,7 +570,7 @@ void Board::validBishopMove(std::vector<Move>& legalMoves, int rank, int file, i
     }
 }
 
-void Board::validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex) {
+void Board::validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
     int knightOffset[8] = {-17, -15, -10, -6, 6, 10, 15, 17};
 
     for (int offset:knightOffset){
@@ -596,6 +596,45 @@ void Board::validKnightMove(std::vector<Move>& legalMoves, int rank, int file, i
     }
 }
 
+void Board::validRookMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex){
+    int directions[4] = {-8,8,-1,1};
+
+    for(int direction:directions){
+        int currentSquare = squareIndex;
+        int targetSquare = squareIndex+direction;
+
+        while(isValidSquare(targetSquare)){
+            //If the target square is empty, it's a valid normal move
+
+            if ((targetSquare / 8) != (currentSquare / 8) && (targetSquare % 8) != (currentSquare % 8)) {
+                break;  // Reached the edge of the board in the current direction, stop moving
+            }
+            
+            if (squares[targetSquare] == EMPTY) {
+                Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
+                std::cout<<"Moving rook from "<<squareIndex<<" to "<<targetSquare<<std::endl;
+                legalMoves.push_back(normalMove);
+            }
+            //If the target square is occupied by an opponent's piece, it's a valid capture move
+            else if (isOpponentPiece(targetSquare)) {
+                Piece capturedPiece = squares[targetSquare];
+                Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
+                std::cout<<"[Capture] Moving rook from "<<squareIndex<<" to "<<targetSquare<<std::endl;
+                legalMoves.push_back(captureMove);
+                // Break the loop as the rook cannot move further in this direction after a capture
+                break;
+            }
+            //If the target square is occupied by the player's own piece, stop moving in this direction
+            else {
+                break;
+            }
+
+            //Move to the next square in the current direction
+            currentSquare = targetSquare;
+            targetSquare += direction;
+        }
+    }
+}
 
 bool Board::isValidSquare(int squareIndex){
     return squareIndex >= 0 && squareIndex < 64;
@@ -648,6 +687,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                 case KNIGHT:
                     validKnightMove(legalMoves,rank,file,squareIndex);
                     break;
+                case ROOK:
+                    validRookMove(legalMoves,rank,file,squareIndex);
+                    break;
             }
         }
         else{
@@ -660,6 +702,9 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     break;
                 case BLACK_KNIGHT:
                     validKnightMove(legalMoves,rank,file,squareIndex);
+                    break;
+                case BLACK_ROOK:
+                    validRookMove(legalMoves,rank,file,squareIndex);
                     break;
             }
         }

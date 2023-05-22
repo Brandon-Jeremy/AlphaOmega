@@ -89,6 +89,7 @@ class Board {
         void validPawnmove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validBishopMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         void validKnightMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
+        void validRookMove(std::vector<Move>& legalMoves, int rank, int file, int squareIndex);
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
 
