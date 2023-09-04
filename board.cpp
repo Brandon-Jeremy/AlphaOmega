@@ -654,11 +654,9 @@ void Board::validQueenMove(std::vector<Move>& legalMoves, int rank, int file, in
 
         while (isValidSquare(targetSquare)){
             //Check if the target square is on a different rank, file, or diagonal
-            if ((targetSquare / 8) != (currentSquare / 8) && (targetSquare % 8) != (currentSquare % 8) &&
-                std::abs(targetSquare / 8 - currentSquare / 8) != std::abs(targetSquare % 8 - currentSquare % 8)) {
-                    break;  //Reached the edge of the board in the current direction, stop moving
+            if (std::abs(targetSquare / 8 - currentSquare / 8) > 1 || std::abs(targetSquare % 8 - currentSquare % 8) > 1) {
+                break;  //Moved too far from the current square, stop moving
             }
-
 
             if (squares[targetSquare] == EMPTY){
                 Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
