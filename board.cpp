@@ -649,24 +649,30 @@ void Board::validQueenMove(std::vector<Move>& legalMoves, int rank, int file, in
         int currentSquare = squareIndex;
         int targetSquare = currentSquare + direction;
 
+        int targetRank = targetSquare/8;
+        int targetFile = targetSquare%8;
+
         while (isValidSquare(targetSquare)){
             //Check if the target square is on a different rank, file, or diagonal
             if ((targetSquare / 8) != (currentSquare / 8) && (targetSquare % 8) != (currentSquare % 8) &&
                 std::abs(targetSquare / 8 - currentSquare / 8) != std::abs(targetSquare % 8 - currentSquare % 8)) {
-                break;  //Reached the edge of the board in the current direction, stop moving
+                    break;  //Reached the edge of the board in the current direction, stop moving
             }
+
 
             if (squares[targetSquare] == EMPTY){
                 Move normalMove{squareIndex, targetSquare, squares[squareIndex], EMPTY, NORMAL};
                 std::cout<<"Moving Queen from "<<squareIndex<<" to "<<targetSquare<<std::endl;
                 legalMoves.push_back(normalMove);
-            } else if (isOpponentPiece(targetSquare)){
+            } 
+            else if (isOpponentPiece(targetSquare)){
                 Piece capturedPiece = squares[targetSquare];
                 std::cout<<"[Capture] Moving Queen from "<<squareIndex<<" to "<<targetSquare<<std::endl;
                 Move captureMove{squareIndex, targetSquare, squares[squareIndex], capturedPiece, CAPTURE};
                 legalMoves.push_back(captureMove);
                 break;
-            } else{
+            } 
+            else{
                 break;
             }
 
@@ -892,6 +898,11 @@ int Board::parseFEN(Board board){
         if (!line.empty() && line.back() == '\n') {
             line.pop_back(); // Remove the newline character '\n' if present
         }
+        if (!line.empty() && line.find("//") == 0) {
+            std::cout << line << std::endl;
+            line.clear();
+            continue; // Skip the line
+        }
         
         // Process each line here
         std::cout << line << std::endl;
@@ -928,6 +939,35 @@ int Board::parseFEN(Board board){
 
     file.close();
     return 0;
+}
+
+bool Board::isKingInCheck(char sideToMove){
+    // Retrieve the king's square
+    int kingSquare = (sideToMove == 'w') ? whiteKingSquare : blackKingSquare;
+    // Check if any opponent's piece attacks the king's square
+    std::vector<Move> opponentMoves;
+    if(sideToMove=='w'){
+        opponentMoves=generateLegalMoves('b');
+    }
+    else{
+        opponentMoves=generateLegalMoves('w');
+    }
+        
+    // Check if any move targets the king's square
+    for (const Move& move:opponentMoves){
+        if (move.targetSquare == kingSquare){
+            return true;  //King is in check
+        }
+    }
+    return false;  //King is not in check
+}
+
+void Board::updateKingSquare(int squareIndex, char side){
+    if (side == 'w') {
+        whiteKingSquare = squareIndex;
+    } else if (side == 'b') {
+        blackKingSquare = squareIndex;
+    }
 }
 
 int main()
