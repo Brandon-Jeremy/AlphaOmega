@@ -766,6 +766,55 @@ bool Board::isValidKnightTarget(int sourceSquare, int targetSquare){
     return rankDiff <= 2 && fileDiff <= 2 && rankDiff + fileDiff == 3;
 }
 
+void Board::makeMove(Move move, Board board){
+    int source = move.sourceSquare; 
+
+    int sourceRank = source / 8;
+    int sourceFile = source % 8;
+
+    int target = move.targetSquare;
+
+    int targetRank = target / 8;
+    int targetFile = target % 8;
+
+    Piece capturedPiece = move.capturedPiece;
+    Piece promotedPiece = move.promotedPiece;
+
+    Piece p = board.getPiece(sourceFile,sourceRank);
+
+    board.setPiece(targetRank,targetFile,p);
+    board.setPiece(sourceRank,sourceFile,EMPTY);
+}
+
+/**
+ * Interpose check by (inefficiently) looping through all legal moves and interposing checks
+ * Then check if that move made will no longer place the king in check (WIP)
+*/
+
+std::vector<Move> Board::interposeCheck(std::vector<Move> moves, char sideToMove, Board board){
+    std::vector<Move> allMoves;
+    allMoves = moves;
+
+    std::vector<Move> legalInterpose;
+
+    for(Move move : allMoves){
+        Board tempBoard = board;
+        tempBoard.makeMove(move, board);
+
+        Piece p = move.movedPiece;
+
+        if(!board.isKingInCheck(sideToMove)){
+            legalInterpose.push_back(move);
+            std::cout << "\n--------------------Blocked Check\n";
+            board.printBoard();
+        }
+
+    }
+
+    return legalInterpose;
+    
+}
+
 /**
  * Board:: since we are accessing a private array called squares 
  * If squares were public we wouldn't need Board::
@@ -799,6 +848,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     validKingMove(legalMoves,rank,file,squareIndex);
                     break;
             }
+            sideToMove='b';
         }
         else{
             switch(piece){
@@ -822,6 +872,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     break;
             }
         }
+        sideToMove='w';
     }
     return legalMoves;
 }
@@ -914,12 +965,24 @@ int Board::parseFEN(Board board){
         std::vector<Move> legalMoves;
 
         auto startTime = std::chrono::steady_clock::now();
-
+        std::cout<<"THE SIDE TO MOVE IS "<<sideToMove<<"\n";
         legalMoves = board.generateLegalMoves(board.sideToMove);
 
         for (const auto& move : legalMoves) {
             std::cout << move.sourceSquare<< " ";
         }
+        std::cout<<"\nTHE SIDE TO MOVE IS "<<sideToMove;
+        std::cout<< "\nI AM FUCKING HEREEEEEEEEEEEEEEEEEEEEEEEE\n";
+
+
+        // bool isChecked = board.isKingInCheck(sideToMove);
+        // std::cout<<sideToMove;
+        // if(isChecked){
+        //     std::vector<Move> interposeCheck = board.interposeCheck(legalMoves, sideToMove, board);
+        // }
+
+        //wrong output. check problem
+
         auto endTime = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
         

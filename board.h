@@ -101,6 +101,9 @@ class Board {
         int algebraicToNumeric(std::string algebraic);
         std::string numericToAlgebraic(int squareIndex);
 
+        std::vector<Move> interposeCheck(std::vector<Move> moves, char sideToMove, Board board);
+        void makeMove(Move move, Board board);
+
         bool isValidSquare(int squareIndex);
         bool isOpponentPiece(int squareIndex);
         bool isEdgeFile_Bishop(int squareIndex, int direction);
