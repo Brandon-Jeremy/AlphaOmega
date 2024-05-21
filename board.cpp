@@ -805,7 +805,7 @@ std::vector<Move> Board::interposeCheck(std::vector<Move> moves, char sideToMove
 
         if(!board.isKingInCheck(sideToMove)){
             legalInterpose.push_back(move);
-            std::cout << "\n--------------------Blocked Check\n";
+            std::cout << "\n--------------------Blocked Check--------------------\n";
             board.printBoard();
         }
 
@@ -821,13 +821,13 @@ std::vector<Move> Board::interposeCheck(std::vector<Move> moves, char sideToMove
 */
 std::vector<Move> Board::generateLegalMoves(char sideToMove){
     std::vector<Move> legalMoves;
-
+    
     //Loop done from 0-64 to take advantage of 1D array and parallelize
     for(int squareIndex=0;squareIndex<64;squareIndex++){
         Piece piece = squares[squareIndex];
         int rank = squareIndex/8;
         int file = squareIndex % 8;
-        if(sideToMove=='w'){
+        if(sideToMove=='w'){            
             switch(piece){
                 case PAWN:
                     validPawnmove(legalMoves,rank,file,squareIndex);
@@ -847,8 +847,7 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                 case KING:
                     validKingMove(legalMoves,rank,file,squareIndex);
                     break;
-            }
-            sideToMove='b';
+            }         
         }
         else{
             switch(piece){
@@ -871,9 +870,15 @@ std::vector<Move> Board::generateLegalMoves(char sideToMove){
                     validKingMove(legalMoves,rank,file,squareIndex);
                     break;
             }
-        }
-        sideToMove='w';
+        }   
     }
+
+    if (sideToMove == 'b') {
+        Board::sideToMove = 'w';
+    } else if (sideToMove == 'w') {
+        Board::sideToMove = 'b';
+    }
+
     return legalMoves;
 }
 
@@ -965,20 +970,21 @@ int Board::parseFEN(Board board){
         std::vector<Move> legalMoves;
 
         auto startTime = std::chrono::steady_clock::now();
-        std::cout<<"THE SIDE TO MOVE IS "<<sideToMove<<"\n";
+        std::cout<<"THE SIDE TO MOVE IS "<<board.sideToMove<<"\n";
         legalMoves = board.generateLegalMoves(board.sideToMove);
 
         for (const auto& move : legalMoves) {
             std::cout << move.sourceSquare<< " ";
         }
-        std::cout<<"\nTHE SIDE TO MOVE IS "<<sideToMove;
-        std::cout<< "\nI AM FUCKING HEREEEEEEEEEEEEEEEEEEEEEEEE\n";
+
+        std::cout<<"\n\nTHE SIDE TO MOVE IS "<<board.sideToMove;
+        std::cout<< "\n===================================================\n";
 
 
-        // bool isChecked = board.isKingInCheck(sideToMove);
-        // std::cout<<sideToMove;
+        bool isChecked = board.isKingInCheck(board.sideToMove);
+        std::cout<<"HERE IS "<<board.sideToMove<<" KING CHECKED??: "<<isChecked<<std::endl;
         // if(isChecked){
-        //     std::vector<Move> interposeCheck = board.interposeCheck(legalMoves, sideToMove, board);
+        //     std::vector<Move> interposeCheck = board.interposeCheck(legalMoves, board.sideToMove, board);
         // }
 
         //wrong output. check problem
@@ -1003,15 +1009,24 @@ int Board::parseFEN(Board board){
 }
 
 bool Board::isKingInCheck(char sideToMove){
+    std::cout<<"Checking if king is in check for "<<sideToMove<<std::endl;
     // Retrieve the king's square
     int kingSquare = (sideToMove == 'w') ? whiteKingSquare : blackKingSquare;
     // Check if any opponent's piece attacks the king's square
     std::vector<Move> opponentMoves;
+
+    // Print King Position 
+    std::cout<<kingSquare<<std::endl;
+
     if(sideToMove=='w'){
-        opponentMoves=generateLegalMoves('b');
+        Board::sideToMove = 'b';
+        opponentMoves=generateLegalMoves(sideToMove);
+        Board::sideToMove = 'w';
     }
     else{
-        opponentMoves=generateLegalMoves('w');
+        Board::sideToMove = 'w';
+        opponentMoves=generateLegalMoves(sideToMove);
+        Board::sideToMove = 'b';
     }
         
     // Check if any move targets the king's square
